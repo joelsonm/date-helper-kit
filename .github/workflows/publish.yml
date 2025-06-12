@@ -1,23 +1,23 @@
-name: Publish to npm
+name: 🚀 Release and Publish
 
 on:
   push:
     branches:
       - main
-    paths:
-      - "package.json"
-      - "src/**"
-      - "tsconfig.json"
-      - "tsup.config.ts"
-      - "README.md"
 
 jobs:
-  publish:
-    name: 🚀 Publish to NPM
+  release:
+    name: 🚀 Semantic Release
     runs-on: ubuntu-latest
 
+    permissions:
+      contents: write # necessário para criar tag e release
+      packages: write
+      issues: write
+      pull-requests: write
+
     steps:
-      - name: ⬇️ Checkout code
+      - name: ⬇️ Checkout repository
         uses: actions/checkout@v4
 
       - name: 📦 Setup Node.js
@@ -35,21 +35,8 @@ jobs:
       - name: 🛠️ Build
         run: npm run build
 
-      - name: 📤 Check if version was already published
-        id: check-version
-        run: |
-          CURRENT_VERSION=$(node -p "require('./package.json').version")
-          PUBLISHED_VERSIONS=$(npm view $(node -p "require('./package.json').name") versions --json)
-          if [[ "$PUBLISHED_VERSIONS" =~ "$CURRENT_VERSION" ]]; then
-            echo "Version $CURRENT_VERSION already published."
-            echo "continue=false" >> $GITHUB_OUTPUT
-          else
-            echo "Publishing version $CURRENT_VERSION..."
-            echo "continue=true" >> $GITHUB_OUTPUT
-          fi
-
-      - name: 🚀 Publish to NPM
-        if: steps.check-version.outputs.continue == 'true'
-        run: npm publish --access public
+      - name: 🚀 Semantic Release
+        run: npx semantic-release
         env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
