@@ -1,0 +1,55 @@
+name: Publish to npm
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "package.json"
+      - "src/**"
+      - "tsconfig.json"
+      - "tsup.config.ts"
+      - "README.md"
+
+jobs:
+  publish:
+    name: 🚀 Publish to NPM
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: ⬇️ Checkout code
+        uses: actions/checkout@v4
+
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          registry-url: "https://registry.npmjs.org"
+
+      - name: 📥 Install dependencies
+        run: npm install
+
+      - name: 🧪 Run tests
+        run: npm run test
+
+      - name: 🛠️ Build
+        run: npm run build
+
+      - name: 📤 Check if version was already published
+        id: check-version
+        run: |
+          CURRENT_VERSION=$(node -p "require('./package.json').version")
+          PUBLISHED_VERSIONS=$(npm view $(node -p "require('./package.json').name") versions --json)
+          if [[ "$PUBLISHED_VERSIONS" =~ "$CURRENT_VERSION" ]]; then
+            echo "Version $CURRENT_VERSION already published."
+            echo "continue=false" >> $GITHUB_OUTPUT
+          else
+            echo "Publishing version $CURRENT_VERSION..."
+            echo "continue=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: 🚀 Publish to NPM
+        if: steps.check-version.outputs.continue == 'true'
+        run: npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
