@@ -1,1 +1,1 @@
-export { appendOffset } from "./append-offset";
+export * from "./append-offset";
