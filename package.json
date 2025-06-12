@@ -10,19 +10,20 @@
     "utils"
   ],
   "author": "Joelson",
-  "main": "./dist/append-offset.js",
-  "types": "./dist/append-offset.d.ts",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "exports": {
     ".": {
-      "import": "./dist/append-offset.js",
-      "require": "./dist/append-offset.js",
-      "types": "./dist/append-offset.d.ts"
+      "import": "./dist/index.js",
+      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts"
     }
   },
   "scripts": {
-    "build": "tsup src/append-offset.ts --format esm,cjs --dts --out-dir dist --clean",
+    "build": "tsup",
     "test": "vitest run",
-    "dev": "vitest"
+    "dev": "vitest",
+    "prepublishOnly": "npm run build"
   },
   "release": {
     "plugins": [

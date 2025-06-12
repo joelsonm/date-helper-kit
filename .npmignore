@@ -1,0 +1,11 @@
+src/
+tests/
+.github/
+*.config.*
+*.test.*
+*.spec.*
+tsconfig.*
+vitest.config.ts
+.releaserc
+README.md
+CHANGELOG.md
