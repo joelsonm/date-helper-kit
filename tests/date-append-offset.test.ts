@@ -39,6 +39,10 @@ describe("Date Append Offset", () => {
       "2025-06-01T00:00:00-03:00"
     );
 
+    expect(appendOffset("2024-12-16", "America/Sao_Paulo")).toBe(
+      "2024-12-16T00:00:00-03:00"
+    );
+
     expect(appendOffset("2025-06-01T00:34", "America/Sao_Paulo")).toBe(
       "2025-06-01T00:34:00-03:00"
     );

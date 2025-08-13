@@ -26,7 +26,7 @@ export function appendOffset(input: string, timeZone: string): string {
   const [hms] = timePart.split(/[.+]/);
   const [hour, minute, second] = hms.split(":").map(Number);
 
-  if (month >= 12 || day >= 32) throw new Error(`Invalid date: ${input}`);
+  if (month > 12 || day >= 32) throw new Error(`Invalid date: ${input}`);
 
   const localDate = new Date(year, month - 1, day, hour, minute, second || 0);
 
