@@ -1,3 +1,10 @@
+## [1.0.4](https://github.com/joelsonm/date-append-offset/compare/v1.0.3...v1.0.4) (2025-08-13)
+
+
+### Bug Fixes
+
+* correction bug month 12 ([75b6df2](https://github.com/joelsonm/date-append-offset/commit/75b6df22bd10d5189bfebf02b72971e5bffd0756))
+
 ## [1.0.3](https://github.com/joelsonm/date-append-offset/compare/v1.0.2...v1.0.3) (2025-06-12)
 
 
