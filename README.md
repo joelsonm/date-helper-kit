@@ -1,8 +1,8 @@
-# Date Helpers
+# Date Kit
 
 Ensure any ISO date string includes the correct timezone offset — safely, without shifting time.
 
-Date Helpers is a lightweight TypeScript utility that appends the proper timezone offset (IANA) to any ISO date string while preserving the original date/time.
+Date Kit is a lightweight TypeScript utility that appends the proper timezone offset (IANA) to any ISO date string while preserving the original date/time.
 
 ---
 
@@ -24,7 +24,7 @@ Date Helpers is a lightweight TypeScript utility that appends the proper timezon
 ## 📦 Installation
 
 ```bash
-npm install date-helpers
+npm install date-kit
 ```
 
 Also works with `yarn add` or `pnpm add`.
@@ -34,7 +34,7 @@ Also works with `yarn add` or `pnpm add`.
 ## 🚀 Quick Start
 
 ```ts
-import { appendOffset } from 'date-helpers';
+import { appendOffset } from 'date-kit';
 
 // Adds offset and completes missing time
 appendOffset('2025-06-12', 'America/Sao_Paulo');
@@ -64,7 +64,7 @@ appendOffset('2025-06-12T12:00Z-03:00', 'America/Sao_Paulo');
 Beyond `appendOffset`, the lib exports helpers to extract/compose date and time parts:
 
 ```ts
-import { getDate, getTime, joinDateAndTime } from 'date-helpers';
+import { getDate, getTime, joinDateAndTime } from 'date-kit';
 
 // Extracts the date part (YYYY-MM-DD)
 getDate('2025-06-01T00:00:00-03:00');
@@ -136,7 +136,7 @@ joinDateAndTime('2025-06-01', '10:00:00-03:00');
 
 ## 📦 Package
 
-- npm name: `date-helpers`
+- npm name: `date-kit`
 - TypeScript types included (`dist/index.d.ts`).
 
 ---
