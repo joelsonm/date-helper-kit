@@ -10,6 +10,14 @@
     "utils"
   ],
   "author": "Joelson",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/joelsonm/date-helper-kit.git"
+  },
+  "bugs": {
+    "url": "https://github.com/joelsonm/date-helper-kit/issues"
+  },
+  "homepage": "https://github.com/joelsonm/date-helper-kit#readme",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "exports": {
