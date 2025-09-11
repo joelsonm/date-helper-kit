@@ -1,3 +1,10 @@
+# [1.2.0](https://github.com/joelsonm/date-helpers/compare/v1.1.2...v1.2.0) (2025-09-11)
+
+
+### Features
+
+* change package name ([742990a](https://github.com/joelsonm/date-helpers/commit/742990a191541a6a34f209fc70d7db7cb24c511e))
+
 ## [1.1.2](https://github.com/joelsonm/date-helpers/compare/v1.1.1...v1.1.2) (2025-09-11)
 
 
