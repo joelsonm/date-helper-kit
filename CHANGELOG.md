@@ -1,3 +1,10 @@
+## [1.1.1](https://github.com/joelsonm/date-append-offset/compare/v1.1.0...v1.1.1) (2025-09-11)
+
+
+### Bug Fixes
+
+* renama package ([abbf668](https://github.com/joelsonm/date-append-offset/commit/abbf6689f9a06dc090f5390d65faf37077c349d7))
+
 # [1.1.0](https://github.com/joelsonm/date-append-offset/compare/v1.0.4...v1.1.0) (2025-09-11)
 
 
