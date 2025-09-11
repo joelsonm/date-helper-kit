@@ -1,5 +1,5 @@
 {
-  "name": "date-append-offset",
+  "name": "date-helpers",
   "version": "1.1.0",
   "description": "Append timezone offset to ISO date strings safely and consistently",
   "keywords": [

@@ -1,7 +1,7 @@
 import { appendOffset } from "../src";
 import { describe, it, expect } from "vitest";
 
-describe("Date Append Offset", () => {
+describe("Date Helpers", () => {
   it("preserves explicit offset if already present", () => {
     expect(appendOffset("2025-06-01T00:00:00-03:00", "America/Manaus")).toBe(
       "2025-06-01T00:00:00-03:00"
