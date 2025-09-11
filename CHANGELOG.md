@@ -1,3 +1,10 @@
+## [1.1.2](https://github.com/joelsonm/date-helpers/compare/v1.1.1...v1.1.2) (2025-09-11)
+
+
+### Bug Fixes
+
+* correction package name ([e14ebcb](https://github.com/joelsonm/date-helpers/commit/e14ebcbbe75d0a413913749ab42be6949e0077ed))
+
 ## [1.1.1](https://github.com/joelsonm/date-append-offset/compare/v1.1.0...v1.1.1) (2025-09-11)
 
 
