@@ -55,7 +55,7 @@ export function getTime(time: string | Date, timeZone: string = "UTC"): string {
     // Accept either a plain time or a full datetime
     // Capture HH:mm[:ss[.ms]] and ignore any trailing offset
     const m = str.match(
-      /(?:T|^)(\d{2}:\d{2}(?::\d{2}(?:\.\d{1,3})?)?)(?:[+-]\d{2}:?\d{2}|Z)?$/
+      /(?:T|^)(\d{2}:\d{2}(?::\d{2}(?:\.\d{1,3})?)?)(?:[+-]\d{2}(?::?\d{2})?|Z)?$/
     );
     if (m) {
       timePart = m[1];

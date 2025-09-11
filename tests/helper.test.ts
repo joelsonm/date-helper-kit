@@ -16,6 +16,9 @@ describe("Date Helpers", () => {
   it("get time", () => {
     expect(getTime("2025-12-12T00:00:00-03:00")).toBe("00:00:00");
   });
+  it("get only time", () => {
+    expect(getTime("09:10:00-03")).toBe("09:10:00");
+  });
   it("get time + timezone", () => {
     const date = new Date("2025-12-12T00:00:00-03:00");
     date.setHours(5);
