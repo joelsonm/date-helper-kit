@@ -1,4 +1,4 @@
-export function appendOffset(input: string, timeZone: string): string {
+export function parse(input: string, timeZone: string): string {
   let normalized = input.trim();
 
   if (/Z[+-]\d{2}:\d{2}/.test(input)) {
@@ -19,6 +19,13 @@ export function appendOffset(input: string, timeZone: string): string {
     normalized += ":00";
   } else if (/T\d{2}:\d{2}:\d{1}$/.test(normalized)) {
     normalized = normalized.replace(/:(\d)$/, ":0$1");
+  } else if (/T\d{2}:\d{2}[+-]\d{2}$/.test(normalized)) {
+    // e.g. 2025-06-01T10:00-03 -> 2025-06-01T10:00:00-03:00
+    normalized = normalized.replace(
+      /T(\d{2}):(\d{2})([+-]\d{2})$/,
+      "T$1:$2:00$3:00"
+    );
+    return normalized;
   }
 
   const [datePart, timePart] = normalized.split("T");
@@ -59,3 +66,5 @@ export function appendOffset(input: string, timeZone: string): string {
 
   return `${normalized}${offset}`;
 }
+
+export const appendOffset = parse;
