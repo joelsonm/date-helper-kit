@@ -1,68 +1,60 @@
 import { appendOffset } from "./parse";
 
 export function getDate(date: string | Date, timeZone: string = "UTC"): string {
+  // If a Date object is provided, format as calendar date (UTC-based)
   if (date instanceof Date) {
-    // Use Intl.DateTimeFormat to format date in the given timeZone
-    const formatter = new Intl.DateTimeFormat("en-CA", {
-      timeZone,
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-    });
-    // en-CA gives YYYY-MM-DD
-    return formatter.format(date);
+    const y = date.getUTCFullYear();
+    const m = String(date.getUTCMonth() + 1).padStart(2, "0");
+    const d = String(date.getUTCDate()).padStart(2, "0");
+    return `${y}-${m}-${d}`;
   }
-  let datePart: string;
-  if (typeof date === "string" && date.match(/T.*([+-]\d{2}:?\d{2}|Z)$/)) {
-    // Use the formatter to get the date in the target timeZone, preserving the local time
-    const parts = date.split("T");
-    const timePart =
-      parts[1]?.replace(/([+-]\d{2}:?\d{2}|Z)$/, "") || "00:00:00";
-    const isoString = `${parts[0]}T${timePart}`;
-    const localDate = new Date(isoString);
-    const formatter = new Intl.DateTimeFormat("en-CA", {
-      timeZone,
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-    });
-    datePart = formatter.format(localDate);
-  } else {
-    datePart = typeof date === "string" ? date.split("T")[0] : "";
+
+  let datePart: string = "";
+  if (typeof date === "string") {
+    // If full datetime with offset
+    if (/T.*([+-]\d{2}:?\d{2}|Z)$/.test(date)) {
+      // Special case: "-00:00" means unknown local offset; do NOT convert to target timeZone
+      if (/T.*-00:00$/.test(date)) {
+        datePart = date.split("T")[0];
+      } else {
+        // Convert the instant to the target timeZone and take the calendar date
+        const d = new Date(date);
+        const formatter = new Intl.DateTimeFormat("en-CA", {
+          timeZone,
+          year: "numeric",
+          month: "2-digit",
+          day: "2-digit",
+        });
+        datePart = formatter.format(d);
+      }
+    } else {
+      // Either a plain date or a datetime without offset; just take the date part
+      datePart = date.split("T")[0];
+    }
   }
+
   if (!/^\d{4}-\d{2}-\d{2}$/.test(datePart)) {
     throw new Error(`Invalid date part: ${date}`);
   }
   return datePart;
 }
 
-export function getTime(time: string | Date, timeZone: string = "UTC"): string {
+export function getTime(time: string | Date, _timeZone: string = "UTC"): string {
+  let timePart = "";
   if (time instanceof Date) {
-    // Use Intl.DateTimeFormat to format time in the given timeZone
-    const formatter = new Intl.DateTimeFormat("en-GB", {
-      timeZone,
-      hour: "2-digit",
-      minute: "2-digit",
-      second: "2-digit",
-      hour12: false,
-    });
-    // Format returns "HH:mm:ss"
-    const parts = formatter.formatToParts(time);
-    const get = (type: string) =>
-      parts.find((p) => p.type === type)?.value || "00";
-    const ms = time.getMilliseconds();
-    let timeStr = `${get("hour")}:${get("minute")}:${get("second")}`;
-    if (ms > 0) {
-      timeStr += `.${String(ms).padStart(3, "0")}`;
+    // Interpret the Date's clock time as-is (no TZ conversion)
+    const h = String(time.getHours()).padStart(2, "0");
+    const m = String(time.getMinutes()).padStart(2, "0");
+    const s = String(time.getSeconds()).padStart(2, "0");
+    timePart = `${h}:${m}:${s}`;
+  } else if (typeof time === "string") {
+    const str = time.trim();
+    // Accept either a plain time or a full datetime
+    // Capture HH:mm[:ss[.ms]] and ignore any trailing offset
+    const m = str.match(/(?:T|^)(\d{2}:\d{2}(?::\d{2}(?:\.\d{1,3})?)?)(?:[+-]\d{2}:?\d{2}|Z)?$/);
+    if (m) {
+      timePart = m[1];
     }
-    return timeStr;
-  }
-  // If time is a string like "2025-12-12T00:00:00-03:00", extract the time part
-  let timePart = time;
-  if (typeof time === "string" && time.includes("T")) {
-    timePart = time.split("T")[1];
-    // Remove timezone offset if present
-    timePart = timePart.replace(/([+-]\d{2}:?\d{2}|Z)$/, "");
   }
   if (!/^\d{2}:\d{2}(:\d{2}(\.\d{1,3})?)?$/.test(timePart)) {
     throw new Error(`Invalid time part: ${time}`);
@@ -75,31 +67,63 @@ export function joinDateAndTime(
   time: string | Date,
   timeZone: string = "UTC"
 ): string {
-  const datePart =
-    date instanceof Date
-      ? date.toISOString().split("T")[0]
-      : date.split("T")[0];
-  const timePart =
-    time instanceof Date
-      ? time.toLocaleTimeString("en-US", {
-          hour12: false,
-          hour: "2-digit",
-          minute: "2-digit",
-          second: "2-digit",
-          timeZone,
-        })
-      : time.split("T")[1] || time;
+  let datePart = "";
+  let timePart = "";
+
+  // Date part: treat as calendar date only (no TZ conversion)
+  if (date instanceof Date) {
+    const y = date.getUTCFullYear();
+    const m = String(date.getUTCMonth() + 1).padStart(2, "0");
+    const d = String(date.getUTCDate()).padStart(2, "0");
+    datePart = `${y}-${m}-${d}`;
+  } else if (typeof date === "string") {
+    datePart = date.includes("T") ? date.split("T")[0] : date;
+  }
+
+  // Time part
+  if (time instanceof Date) {
+    const h = String(time.getHours()).padStart(2, "0");
+    const m = String(time.getMinutes()).padStart(2, "0");
+    const s = String(time.getSeconds()).padStart(2, "0");
+    timePart = `${h}:${m}:${s}`;
+  } else if (typeof time === "string") {
+    const m = time.match(/^(\d{2}):(\d{2})(?::(\d{2})(?:\.(\d{1,3}))?)?([+-]\d{2}(?::?\d{2})?|Z)?$/);
+    if (!m) {
+      throw new Error(`Invalid time part: ${time}`);
+    }
+    const hour = m[1] || "00";
+    const minute = m[2] || "00";
+    const second = m[3] || "00";
+    const ms = m[4] ? m[4].padEnd(3, "0") : "000";
+    const offset = m[5] || "";
+
+    const baseTime = `${hour}:${minute}:${second}${ms !== "000" ? "." + ms : ""}`;
+
+    if (offset) {
+      // Normalize and keep the provided offset (no conversion)
+      let normalizedOffset = offset;
+      if (offset === "Z") normalizedOffset = "+00:00";
+      else if (/^[+-]\d{2}$/.test(offset)) normalizedOffset = offset + ":00";
+      else if (/^[+-]\d{4}$/.test(offset)) normalizedOffset = `${offset.slice(0, 3)}:${offset.slice(3)}`;
+      return `${datePart}T${baseTime}${normalizedOffset}`;
+    }
+
+    timePart = baseTime;
+  }
 
   if (!/^\d{4}-\d{2}-\d{2}$/.test(datePart)) {
     throw new Error(`Invalid date part: ${date}`);
   }
-
-  if (
-    !/^\d{2}:\d{2}(:\d{2}(\.\d{1,3})?)?([+-]\d{2}(:?\d{2})?|[+-]\d{2}|Z)?$/.test(
-      timePart
-    )
-  ) {
+  if (!/^\d{2}:\d{2}(:\d{2}(\.\d{1,3})?)?$/.test(timePart)) {
     throw new Error(`Invalid time part: ${time}`);
+  }
+
+  // If the timeZone is provided as a fixed offset, normalize and append directly
+  if (/^[+-]\d{2}(:?\d{2})?$/.test(timeZone)) {
+    let normalized = timeZone;
+    if (/^[+-]\d{2}$/.test(timeZone)) normalized = timeZone + ":00";
+    if (/^[+-]\d{4}$/.test(timeZone)) normalized = `${timeZone.slice(0, 3)}:${timeZone.slice(3)}`;
+    return `${datePart}T${timePart}${normalized}`;
   }
 
   return appendOffset(`${datePart}T${timePart}`, timeZone);
