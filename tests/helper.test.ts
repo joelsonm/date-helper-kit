@@ -1,7 +1,7 @@
 import { getDate, getTime } from "../src";
 import { describe, it, expect } from "vitest";
 
-describe("Date Kit", () => {
+describe("Date Helper Kit", () => {
   it("get full date + time + timezone", () => {
     expect(getDate("2025-06-01T00:00:00-03:00")).toBe("2025-06-01");
   });

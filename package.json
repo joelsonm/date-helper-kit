@@ -1,6 +1,6 @@
 {
-  "name": "date-kit",
-  "version": "1.2.0",
+  "name": "date-helper-kit",
+  "version": "0.0.0",
   "description": "Append timezone offset to ISO date strings safely and consistently",
   "keywords": [
     "timezone",
