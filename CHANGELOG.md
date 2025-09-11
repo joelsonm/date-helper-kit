@@ -1,3 +1,10 @@
+## [1.3.1](https://github.com/joelsonm/date-helper-kit/compare/v1.3.0...v1.3.1) (2025-09-11)
+
+
+### Bug Fixes
+
+* add github package ([683d1e1](https://github.com/joelsonm/date-helper-kit/commit/683d1e1a83da5c7364d03bb6b06688e3d37407e4))
+
 # [1.3.0](https://github.com/joelsonm/date-kit/compare/v1.2.0...v1.3.0) (2025-09-11)
 
 
