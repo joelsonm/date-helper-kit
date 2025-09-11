@@ -1,3 +1,10 @@
+# [1.3.0](https://github.com/joelsonm/date-kit/compare/v1.2.0...v1.3.0) (2025-09-11)
+
+
+### Features
+
+* renaming package ([6b7279a](https://github.com/joelsonm/date-kit/commit/6b7279a10bb1c6ab1fb0f54c34c6a56cfded656b))
+
 # [1.2.0](https://github.com/joelsonm/date-helpers/compare/v1.1.2...v1.2.0) (2025-09-11)
 
 
