@@ -34,26 +34,26 @@ Also works with `yarn add` or `pnpm add`.
 ## 🚀 Quick Start
 
 ```ts
-import { appendOffset } from 'date-helper-kit';
+import { parse } from 'date-helper-kit';
 
 // Adds offset and completes missing time
-appendOffset('2025-06-12', 'America/Sao_Paulo');
+parse('2025-06-12', 'America/Sao_Paulo');
 // → '2025-06-12T00:00:00-03:00'
 
 // Adds offset and seconds
-appendOffset('2025-06-12T12:00', 'America/Manaus');
+parse('2025-06-12T12:00', 'America/Manaus');
 // → '2025-06-12T12:00:00-04:00'
 
 // Keeps milliseconds; Z becomes +00:00
-appendOffset('2025-06-12T12:00:00.123Z', 'America/Sao_Paulo');
+parse('2025-06-12T12:00:00.123Z', 'America/Sao_Paulo');
 // → '2025-06-12T12:00:00.123+00:00'
 
 // Already has an offset: returned as-is
-appendOffset('2025-06-12T12:00:00-03:00', 'America/Manaus');
+parse('2025-06-12T12:00:00-03:00', 'America/Manaus');
 // → '2025-06-12T12:00:00-03:00'
 
 // Invalid input (mixing Z with offset) throws
-appendOffset('2025-06-12T12:00Z-03:00', 'America/Sao_Paulo');
+parse('2025-06-12T12:00Z-03:00', 'America/Sao_Paulo');
 // → ❌ Error: Invalid date: cannot mix Z (UTC) with offset
 ```
 
@@ -91,10 +91,14 @@ joinDateAndTime('2025-06-01', '10:00:00-03:00');
 
 ## 📚 API
 
-- `appendOffset(input: string, timeZone: string): string`
-  - Appends the correct offset to the ISO input (date-only, datetime with/without seconds/milliseconds).
-  - If the input already contains an offset, returns it unchanged.
+- `parse(input: string, timeZone: string): string`
+  - Appends the correct offset to the ISO-like input (date-only, datetime with/without seconds/milliseconds).
+  - If the input already contains an explicit offset, returns it unchanged.
   - If it ends with `Z`, converts to `+00:00`.
+  - Note: `appendOffset` is a deprecated alias for `parse`.
+
+- `appendOffset(input: string, timeZone: string): string` (deprecated)
+  - Alias to `parse`. Prefer using `parse` going forward.
 
 - `getDate(date: string | Date, timeZone = 'UTC'): string`
   - Returns only the date part `YYYY-MM-DD`.
@@ -103,12 +107,13 @@ joinDateAndTime('2025-06-01', '10:00:00-03:00');
 
 - `getTime(time: string | Date, timeZone = 'UTC'): string`
   - Returns only the time part `HH:mm:ss`.
-  - For `Date`, respects `UTC` when provided; otherwise uses the object's local time.
+  - For strings with a fixed offset (e.g., `-03:00`), returns the local time part directly (no conversion).
+  - For `Date`, returns the time in the provided `timeZone` (default `UTC`). IANA zones are supported in modern runtimes; fixed-offset strings like `+02:00`, `-0300`, or `-03` are also accepted.
 
 - `joinDateAndTime(date: string | Date, time: string | Date, timeZone = 'UTC'): string`
   - Builds `YYYY-MM-DDTHH:mm:ss[.SSS]` and appends an offset.
   - `timeZone` can be IANA (`America/Sao_Paulo`) or a fixed offset (`+02:00`, `-0300`, `-03`).
-  - If the time already has an offset (e.g., `10:00-03:00`), it is preserved.
+  - If the `time` already includes an offset (e.g., `10:00-03:00`, `10:00-04`, or `10:00-0300`), it is preserved and normalized to `±HH:MM`.
 
 ---
 
@@ -118,10 +123,20 @@ joinDateAndTime('2025-06-01', '10:00:00-03:00');
 - Completes seconds when missing (`12:00` → `12:00:00`).
 - Keeps milliseconds when present.
 - Converts `Z` to `+00:00`.
+- Supports short and compact offset inputs and normalizes them:
+  - `-03` → `-03:00`, `-0300` → `-03:00`.
 - Common errors thrown:
   - Mixing `Z` with an offset (e.g., `2025-06-12T12:00Z-03:00`).
   - Invalid formats (e.g., `2025/06/01`, `not-a-date`).
   - Invalid month/day (e.g., month `13`, day `32`).
+
+---
+
+## ♻️ Migration Note
+
+- `appendOffset` has been deprecated in favor of `parse`.
+  - Previous code: `appendOffset('2025-06-12', 'UTC')`
+  - New code: `parse('2025-06-12', 'UTC')`
 
 ---
 
@@ -138,6 +153,13 @@ joinDateAndTime('2025-06-01', '10:00:00-03:00');
 
 - npm name: `date-helper-kit`
 - TypeScript types included (`dist/index.d.ts`).
+
+---
+
+## 🛠️ Development
+
+- Build: `npm run build`
+- Tests: `npm test` (or interactive: `npm run dev`)
 
 ---
 

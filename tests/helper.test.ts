@@ -22,12 +22,14 @@ describe("Date Helper Kit", () => {
   it("extracts time from Date object and converts to specified timezone", () => {
     const date = new Date("2025-12-12T00:00:00-03:00");
     date.setHours(5);
-    expect(getTime(date, "America/Sao_Paulo")).toBe("05:00:00");
+    expect(getTime(date, "America/Sao_Paulo", "America/Sao_Paulo")).toBe(
+      "05:00:00"
+    );
   });
   it("extracts time from Date object and converts to UTC timezone", () => {
     const date = new Date("2025-12-12T00:00:00-03:00");
     date.setHours(5);
-    expect(getTime(date, "UTC")).toBe("08:00:00");
+    expect(getTime(date, "UTC", "America/Sao_Paulo")).toBe("08:00:00");
   });
   it("extracts time from UTC string and converts to specified timezone", () => {
     expect(getTime("2025-09-12T16:08:00.000Z", "America/Sao_Paulo")).toBe(
