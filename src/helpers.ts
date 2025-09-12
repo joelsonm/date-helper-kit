@@ -40,31 +40,119 @@ export function getDate(date: string | Date, timeZone: string = "UTC"): string {
 }
 
 export function getTime(time: string | Date, timeZone: string = "UTC"): string {
-  let timePart = "";
+  let dateObj: Date | null = null;
+
   if (time instanceof Date) {
-    // If the caller explicitly requests UTC, read UTC clock time.
-    const hNum = timeZone === "UTC" ? time.getUTCHours() : time.getHours();
-    const mNum = timeZone === "UTC" ? time.getUTCMinutes() : time.getMinutes();
-    const sNum = timeZone === "UTC" ? time.getUTCSeconds() : time.getSeconds();
-    const h = String(hNum).padStart(2, "0");
-    const m = String(mNum).padStart(2, "0");
-    const s = String(sNum).padStart(2, "0");
-    timePart = `${h}:${m}:${s}`;
+    dateObj = time;
   } else if (typeof time === "string") {
-    const str = time.trim();
-    // Accept either a plain time or a full datetime
-    // Capture HH:mm[:ss[.ms]] and ignore any trailing offset
-    const m = str.match(
-      /(?:T|^)(\d{2}:\d{2}(?::\d{2}(?:\.\d{1,3})?)?)(?:[+-]\d{2}(?::?\d{2})?|Z)?$/
-    );
-    if (m) {
-      timePart = m[1];
+    // If it's a datetime with offset or Z, parse as Date
+    if (/T.*([+-]\d{2}:?\d{2}|Z)$/.test(time)) {
+      // If the string has a fixed offset (e.g., -03:00), return the local time part directly
+      const m = time.match(
+        /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})(?:\.(\d{1,3}))?(Z|[+-]\d{2}:?\d{2})$/
+      );
+      if (m) {
+        const tz = m[8];
+        if (tz && tz !== "Z") {
+          // Return the local time part as is
+          const pad = (n: string) => n.padStart(2, "0");
+          const h = pad(m[4]);
+          const min = pad(m[5]);
+          const sec = pad(m[6]);
+          return `${h}:${min}:${sec}`;
+        }
+        // If Z, treat as UTC
+        const year = Number(m[1]);
+        const month = Number(m[2]) - 1;
+        const day = Number(m[3]);
+        const hour = Number(m[4]);
+        const minute = Number(m[5]);
+        const second = Number(m[6]);
+        const ms = m[7] ? Number(m[7].padEnd(3, "0")) : 0;
+        let dateUTC = Date.UTC(year, month, day, hour, minute, second, ms);
+        dateObj = new Date(dateUTC);
+      } else {
+        dateObj = new Date(time); // fallback, but should not use local time
+      }
+    } else {
+      // Accept either a plain time or a full datetime without offset
+      const str = time.trim();
+      const m = str.match(
+        /(?:T|^)(\d{2}):(\d{2})(?::(\d{2})(?:\.(\d{1,3}))?)?(?:[+-]\d{2}(?::?\d{2})?|Z)?$/
+      );
+      if (m) {
+        const h = Number(m[1]);
+        const min = Number(m[2]);
+        const s = m[3] ? Number(m[3]) : 0;
+        // Use today's date for the Date object
+        const now = new Date();
+        dateObj = new Date(
+          Date.UTC(
+            now.getUTCFullYear(),
+            now.getUTCMonth(),
+            now.getUTCDate(),
+            h,
+            min,
+            s
+          )
+        );
+      }
     }
   }
-  if (!/^\d{2}:\d{2}(:\d{2}(\.\d{1,3})?)?$/.test(timePart)) {
+
+  if (!dateObj) {
     throw new Error(`Invalid time part: ${time}`);
   }
-  return timePart;
+
+  // Only support UTC or fixed offset timeZone
+  let hours = dateObj.getUTCHours();
+  let minutes = dateObj.getUTCMinutes();
+  let seconds = dateObj.getUTCSeconds();
+
+  // If timeZone is a fixed offset (e.g. "-03:00", "+0200")
+  const offsetMatch = timeZone.match(/^([+-])(\d{2}):?(\d{2})$/);
+  if (offsetMatch) {
+    const sign = offsetMatch[1] === "+" ? 1 : -1;
+    const offsetHours = parseInt(offsetMatch[2], 10);
+    const offsetMinutes = parseInt(offsetMatch[3], 10);
+    const totalOffset = sign * (offsetHours * 60 + offsetMinutes);
+
+    // Adjust UTC time by offset
+    const totalMinutes = hours * 60 + minutes + totalOffset;
+    hours = Math.floor(((totalMinutes + 1440) % 1440) / 60);
+    minutes = (totalMinutes + 1440) % 60;
+    // seconds remain the same
+  }
+  // If timeZone is not UTC or a fixed offset, try to handle IANA time zones (e.g., "America/Sao_Paulo")
+  if (
+    timeZone !== "UTC" &&
+    !/^[+-]\d{2}(:?\d{2})?$/.test(timeZone) &&
+    typeof Intl === "object" &&
+    typeof Intl.DateTimeFormat === "function"
+  ) {
+    // Use Date object to get the offset for the IANA time zone
+    // We avoid using Intl.DateTimeFormat for formatting, but we can use it to get the offset
+    try {
+      const dtf = new Intl.DateTimeFormat("en-US", {
+        timeZone,
+        hour12: false,
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+      });
+      const parts = dtf.formatToParts(dateObj);
+      const h = Number(parts.find((p) => p.type === "hour")?.value || "00");
+      const min = Number(parts.find((p) => p.type === "minute")?.value || "00");
+      const sec = Number(parts.find((p) => p.type === "second")?.value || "00");
+      const pad = (n: number) => String(n).padStart(2, "0");
+      return `${pad(h)}:${pad(min)}:${pad(sec)}`;
+    } catch {
+      // fallback to UTC if timeZone is invalid or not supported
+    }
+  }
+
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
 }
 
 export function joinDateAndTime(

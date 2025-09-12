@@ -67,4 +67,7 @@ export function parse(input: string, timeZone: string): string {
   return `${normalized}${offset}`;
 }
 
+/**
+ * @deprecated Use `parse` directly instead.
+ */
 export const appendOffset = parse;
