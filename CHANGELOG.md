@@ -1,3 +1,11 @@
+# [1.4.0](https://github.com/joelsonm/date-helper-kit/compare/v1.3.1...v1.4.0) (2025-09-12)
+
+
+### Features
+
+* enhance date and time handling with improved parsing and merging logic ([4ff1835](https://github.com/joelsonm/date-helper-kit/commit/4ff1835e3c2e38dd193aa28a05a35d851fe7a135))
+* refactor time handling functions and deprecate appendOffset; add tests for timezone conversion ([c1ec54d](https://github.com/joelsonm/date-helper-kit/commit/c1ec54d527601910e03a1c49c1b7acd3e0bb3f46))
+
 ## [1.3.1](https://github.com/joelsonm/date-helper-kit/compare/v1.3.0...v1.3.1) (2025-09-11)
 
 
