@@ -41,9 +41,11 @@ export function getDate(date: string | Date, timeZone: string = "UTC"): string {
 
 export function getTime(
   time: string | Date,
-  timeZone: string = "UTC",
-  fromTimeZone?: string
+  timeZone?: string
 ): string {
+  // Default to the system's local timezone when not provided
+  const targetTimeZone =
+    timeZone ?? Intl.DateTimeFormat().resolvedOptions().timeZone ?? "UTC";
   const pad = (n: number) => String(n).padStart(2, "0");
 
   // --- 1) Strings ---
@@ -67,7 +69,7 @@ export function getTime(
       const ms = mIso[7] ? mIso[7].padEnd(3, "0") : "000";
       const norm = `${mIso[1]}-${mIso[2]}-${mIso[3]}T${hh}:${mm}:${ss}.${ms}Z`;
       const dateObj = new Date(norm);
-      return formatWithTimeZone(dateObj, timeZone);
+      return formatWithTimeZone(dateObj, targetTimeZone);
     }
 
     // b) ISO sem TZ
@@ -107,26 +109,8 @@ export function getTime(
 
   // --- 2) Date ---
   if (time instanceof Date) {
-    // Com origem explícita: tratamos os CAMPOS LOCAIS do Date como hora civil
-    // na timezone de origem (independente do TZ do processo), construímos o
-    // instante correspondente e então formatamos para o destino.
-    if (fromTimeZone) {
-      const civilDate = `${time.getFullYear()}-${pad(time.getMonth() + 1)}-${pad(
-        time.getDate()
-      )}`;
-      const civilTime = `${pad(time.getHours())}:${pad(time.getMinutes())}:${pad(
-        time.getSeconds()
-      )}`;
-
-      const withSrcOffset = appendOffset(`${civilDate}T${civilTime}`, fromTimeZone);
-      const asInstant = new Date(withSrcOffset);
-
-      if (timeZone === fromTimeZone) return civilTime;
-      return formatWithTimeZone(asInstant, timeZone);
-    }
-
-    // Sem origem explícita: trata Date como instante (comportamento prévio)
-    return formatWithTimeZone(time, timeZone);
+    // Trata Date como um instante e formata no timezone de destino
+    return formatWithTimeZone(time, targetTimeZone);
   }
 
   throw new Error("Invalid time input type");

@@ -19,17 +19,13 @@ describe("Date Helper Kit", () => {
   it("extracts time from time string with offset", () => {
     expect(getTime("09:10:00-03")).toBe("09:10:00");
   });
-  it("extracts time from Date object and converts to specified timezone", () => {
-    const date = new Date("2025-12-12T00:00:00-03:00");
-    date.setHours(5);
-    expect(getTime(date, "America/Sao_Paulo", "America/Sao_Paulo")).toBe(
-      "05:00:00"
-    );
+  it("extracts time from Date object and converts to specified IANA timezone", () => {
+    const date = new Date("2025-12-12T00:00:00Z");
+    expect(getTime(date, "America/Sao_Paulo")).toBe("21:00:00");
   });
-  it("extracts time from Date object and converts to UTC timezone", () => {
-    const date = new Date("2025-12-12T00:00:00-03:00");
-    date.setHours(5);
-    expect(getTime(date, "UTC", "America/Sao_Paulo")).toBe("08:00:00");
+  it("extracts time from Date object and converts to fixed offset timezone", () => {
+    const date = new Date("2025-12-12T00:00:00Z");
+    expect(getTime(date, "+02:00")).toBe("02:00:00");
   });
   it("extracts time from UTC string and converts to specified timezone", () => {
     expect(getTime("2025-09-12T16:08:00.000Z", "America/Sao_Paulo")).toBe(
@@ -37,8 +33,19 @@ describe("Date Helper Kit", () => {
     );
   });
 
-  it("extracts time from UTC string without timezone conversion", () => {
-    expect(getTime("2025-09-12T16:08:00.000Z")).toBe("16:08:00");
+  it("extracts time from UTC string using system timezone by default", () => {
+    const localTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    const parts = new Intl.DateTimeFormat("en-US", {
+      timeZone: localTz,
+      hour12: false,
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+    }).formatToParts(new Date("2025-09-12T16:08:00.000Z"));
+    const hh = parts.find((p) => p.type === "hour")?.value ?? "00";
+    const mm = parts.find((p) => p.type === "minute")?.value ?? "00";
+    const ss = parts.find((p) => p.type === "second")?.value ?? "00";
+    expect(getTime("2025-09-12T16:08:00.000Z")).toBe(`${hh}:${mm}:${ss}`);
   });
 
   // Additional tests
@@ -72,8 +79,19 @@ describe("Date Helper Kit", () => {
     expect(getDate("2024-02-29T12:00:00Z")).toBe("2024-02-29");
   });
 
-  it("extracts midnight time from ISO string", () => {
-    expect(getTime("2025-01-01T00:00:00Z")).toBe("00:00:00");
+  it("extracts midnight time from ISO string using system timezone by default", () => {
+    const localTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    const parts = new Intl.DateTimeFormat("en-US", {
+      timeZone: localTz,
+      hour12: false,
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+    }).formatToParts(new Date("2025-01-01T00:00:00Z"));
+    const hh = parts.find((p) => p.type === "hour")?.value ?? "00";
+    const mm = parts.find((p) => p.type === "minute")?.value ?? "00";
+    const ss = parts.find((p) => p.type === "second")?.value ?? "00";
+    expect(getTime("2025-01-01T00:00:00Z")).toBe(`${hh}:${mm}:${ss}`);
   });
 
   it("extracts date correctly when timezone offset causes day rollover", () => {

@@ -105,10 +105,10 @@ joinDateAndTime('2025-06-01', '10:00:00-03:00');
   - For strings with a known offset, converts the instant to the calendar date in the given `timeZone`.
   - If the offset is `-00:00` (unknown local offset), no timezone conversion is performed.
 
-- `getTime(time: string | Date, timeZone = 'UTC'): string`
+- `getTime(time: string | Date, timeZone = system timezone): string`
   - Returns only the time part `HH:mm:ss`.
   - For strings with a fixed offset (e.g., `-03:00`), returns the local time part directly (no conversion).
-  - For `Date`, returns the time in the provided `timeZone` (default `UTC`). IANA zones are supported in modern runtimes; fixed-offset strings like `+02:00`, `-0300`, or `-03` are also accepted.
+  - For `Date`, returns the time in the provided `timeZone` (defaults to the machine's timezone). IANA zones are supported in modern runtimes; fixed-offset strings like `+02:00`, `-0300`, or `-03` are also accepted.
 
 - `joinDateAndTime(date: string | Date, time: string | Date, timeZone = 'UTC'): string`
   - Builds `YYYY-MM-DDTHH:mm:ss[.SSS]` and appends an offset.
