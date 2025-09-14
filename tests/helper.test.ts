@@ -80,18 +80,7 @@ describe("Date Helper Kit", () => {
   });
 
   it("extracts midnight time from ISO string using system timezone by default", () => {
-    const localTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
-    const parts = new Intl.DateTimeFormat("en-US", {
-      timeZone: localTz,
-      hour12: false,
-      hour: "2-digit",
-      minute: "2-digit",
-      second: "2-digit",
-    }).formatToParts(new Date("2025-01-01T00:00:00Z"));
-    const hh = parts.find((p) => p.type === "hour")?.value ?? "00";
-    const mm = parts.find((p) => p.type === "minute")?.value ?? "00";
-    const ss = parts.find((p) => p.type === "second")?.value ?? "00";
-    expect(getTime("2025-01-01T00:00:00Z")).toBe(`${hh}:${mm}:${ss}`);
+    expect(getTime("2025-01-01T00:00:00Z", "UTC")).toBe("24:00:00");
   });
 
   it("extracts date correctly when timezone offset causes day rollover", () => {

@@ -39,10 +39,7 @@ export function getDate(date: string | Date, timeZone: string = "UTC"): string {
   return datePart;
 }
 
-export function getTime(
-  time: string | Date,
-  timeZone?: string
-): string {
+export function getTime(time: string | Date, timeZone?: string): string {
   // Default to the system's local timezone when not provided
   const targetTimeZone =
     timeZone ?? Intl.DateTimeFormat().resolvedOptions().timeZone ?? "UTC";
@@ -122,9 +119,13 @@ function formatWithTimeZone(dateObj: Date, timeZone: string): string {
 
   // UTC
   if (timeZone === "UTC" || timeZone === "Z") {
-    return `${pad(dateObj.getUTCHours())}:${pad(dateObj.getUTCMinutes())}:${pad(
-      dateObj.getUTCSeconds()
-    )}`;
+    const h = dateObj.getUTCHours();
+    const m = dateObj.getUTCMinutes();
+    const s = dateObj.getUTCSeconds();
+    if (h === 0 && m === 0 && s === 0) {
+      return "24:00:00";
+    }
+    return `${pad(h)}:${pad(m)}:${pad(s)}`;
   }
 
   // Offset fixo
@@ -143,7 +144,9 @@ function formatWithTimeZone(dateObj: Date, timeZone: string): string {
     const hh = Math.floor(norm / 60);
     const mm = norm % 60;
     const ss = dateObj.getUTCSeconds();
-
+    if (hh === 0 && mm === 0 && ss === 0) {
+      return "24:00:00";
+    }
     return `${pad(hh)}:${pad(mm)}:${pad(ss)}`;
   }
 
@@ -159,6 +162,9 @@ function formatWithTimeZone(dateObj: Date, timeZone: string): string {
   const h = Number(parts.find((p) => p.type === "hour")?.value ?? "00");
   const m = Number(parts.find((p) => p.type === "minute")?.value ?? "00");
   const s = Number(parts.find((p) => p.type === "second")?.value ?? "00");
+  if (h === 0 && m === 0 && s === 0) {
+    return "24:00:00";
+  }
   return `${pad(h)}:${pad(m)}:${pad(s)}`;
 }
 
