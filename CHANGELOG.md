@@ -1,3 +1,15 @@
+# [1.5.0](https://github.com/joelsonm/date-helper-kit/compare/v1.4.0...v1.5.0) (2025-09-14)
+
+
+### Bug Fixes
+
+* update getTime function to return "24:00:00" for midnight in UTC and adjust related tests ([31f845a](https://github.com/joelsonm/date-helper-kit/commit/31f845a90e266cc62a2b5d381f598ae035859275))
+
+
+### Features
+
+* update getTime function to default to system timezone and improve test cases for timezone conversion ([91eeed7](https://github.com/joelsonm/date-helper-kit/commit/91eeed7f703b5603c2a3c856a86fefab1b8d62da))
+
 # [1.4.0](https://github.com/joelsonm/date-helper-kit/compare/v1.3.1...v1.4.0) (2025-09-12)
 
 
